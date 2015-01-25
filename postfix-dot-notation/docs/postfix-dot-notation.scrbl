@@ -3,6 +3,8 @@
 @(require scribble/eval
           (for-label (except-in racket #%top) postfix-dot-notation))
 
+@title{postfix-dot-notation}
+
 @defmodule[postfix-dot-notation]
 
 @with-eval-preserve-source-locations[@examples[
