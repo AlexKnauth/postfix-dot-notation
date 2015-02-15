@@ -7,34 +7,27 @@
                      syntax/parse
                      racket/syntax
                      syntax/srcloc
+                     "top-utils.rkt"
                      ))
 (module+ test (require (submod "..") rackunit))
 
 (begin-for-syntax
-  (define original-for-check-syntax 'original-for-check-syntax)
-  (define (orig stx)
-    (syntax-property stx original-for-check-syntax #t))
-  (define-syntax-class bd-id
-    [pattern id:id #:when (identifier-binding #'id)])
   (define-syntax-class dot-id
     [pattern id:bd-id #:with norm #'id]
-    [pattern id:id #:when (regexp-match? #px"^(.+)[.]([^.]+)$" (symbol->string (syntax-e #'id)))
-             #:do [(match-define (pregexp #px"^(.+)[.]([^.]+)$"
-                                          (list _ a-str b-str))
-                     (symbol->string (syntax-e #'id)))]
-             #:do [(define a-col  (syntax-column #'id))
-                   (define a-pos  (syntax-position #'id))
+    [pattern (~id-regexp #px"^(.+)[.]([^.]+)$" (list _ a-str b-str))
+             #:do [(define a-col  (syntax-column this-syntax))
+                   (define a-pos  (syntax-position this-syntax))
                    (define a-span (string-length a-str))
                    (define b-col  (+ a-col a-span 1))
                    (define b-pos  (+ a-pos a-span 1))
                    (define b-span (string-length b-str))
-                   (define a-src (update-source-location #'id #:column a-col #:position a-pos
+                   (define a-src (update-source-location this-syntax #:column a-col #:position a-pos
                                                          #:span a-span))
-                   (define b-src (update-source-location #'id #:column b-col #:position b-pos
+                   (define b-src (update-source-location this-syntax #:column b-col #:position b-pos
                                                          #:span b-span))]
-             #:with a:dot-id (orig (format-id #'id "~a" a-str #:source a-src))
-             #:with b:bd-id  (orig (format-id #'id "~a" b-str #:source b-src))
-             #:with norm (orig (syntax/loc #'id (b a.norm)))]))
+             #:with a:dot-id (orig (format-id this-syntax "~a" a-str #:source a-src))
+             #:with b:bd-id  (orig (format-id this-syntax "~a" b-str #:source b-src))
+             #:with norm (orig (syntax/loc this-syntax (b a.norm)))]))
 
 (define-syntax top
   (syntax-parser
