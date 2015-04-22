@@ -5,6 +5,8 @@
 
 @title{postfix-dot-notation}
 
+source code: @url["https://github.com/AlexKnauth/postfix-dot-notation"]
+
 @section{#lang postfix-dot-notation}
 
 @defmodule[postfix-dot-notation #:lang]{
