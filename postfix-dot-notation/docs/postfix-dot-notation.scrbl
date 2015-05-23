@@ -1,7 +1,10 @@
 #lang scribble/manual
 
 @(require scribble/eval
-          (for-label (except-in racket #%top) postfix-dot-notation))
+          (for-label postfix-dot-notation
+                     (except-in racket #%top)
+                     racket/extflonum
+                     racket/format))
 
 @title{postfix-dot-notation}
 
@@ -17,14 +20,30 @@ language at the reader level.
 Code like @racket[a.b] is read as @racket[(b a)], @racket[a.b.c] is read as
 @racket[(c (b a))], and so on.
 
+If you want to use an identifier that is supposed to have a dot in it, there are
+two cases where dot notation is disabled:
+@itemize[
+@item{When an identifier is wrapped in @litchar{||}, it is treated just like a
+      normal identifier wrapped in @litchar{||}. This means you can still use
+      identifiers like @code{|~.a|} from @racketmodname[racket/format] or
+      @code{|pi.t|} from @racketmodname[racket/extflonum].}
+@item{When an identifier begins with a @litchar{.}, it is treated as a normal
+      Identifier.  This means that identifiers like @racket[...]
+      and @racket[....] work as normal.}
+]
+
 @codeblock{
 #lang postfix-dot-notation racket
 (define x "hello-world")
 x.string->symbol ; 'hello-world
 (struct foo (a b c))
 (define y (foo 1 2 3))
-x.foo-a ; 1
-x.foo-b.number->string ; "2"
+y.foo-a ; 1
+y.foo-b.number->string ; "2"
+(parameterize ([error-print-width 10]) ; "(I am a..."
+  (|~.a| '(I am a long list that spans more than (error-print-width))))
+(match '(1 2 3) ; '(2 3)
+  [(list 1 rst ...) rst])
 }
 
 @section{postfix-dot-notation for require}
