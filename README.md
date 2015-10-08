@@ -13,16 +13,3 @@ x.string->symbol ; 'hello-world
 x.foo-a ; 1
 x.foo-b.number->string ; "2"
 ```
-
-And also:
-```racket
-#lang racket
-(require postfix-dot-notation)
-(define x "hello-world")
-x.string->symbol ; 'hello-world
-(struct foo (a b c))
-(define y (foo 1 2 3))
-x.foo-a ; 1
-x.foo-b.number->string ; "2"
-```
-
