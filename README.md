@@ -1,6 +1,6 @@
 postfix-dot-notation [![Build Status](https://travis-ci.org/AlexKnauth/postfix-dot-notation.png?branch=master)](https://travis-ci.org/AlexKnauth/postfix-dot-notation)
 ===
-A racket meta-language for postfix dot notation
+A racket lang-extension for postfix dot notation
 
 documentation: http://pkg-build.racket-lang.org/doc/postfix-dot-notation/index.html
 

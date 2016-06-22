@@ -13,7 +13,7 @@ source code: @url["https://github.com/AlexKnauth/postfix-dot-notation"]
 @section{#lang postfix-dot-notation}
 
 @defmodule[postfix-dot-notation #:lang]{
-A meta-language like @racketmodname[at-exp] that adds postfix-dot-notation to a
+A lang-extension like @racketmodname[at-exp] that adds postfix-dot-notation to a
 language at the reader level.
 }
 
