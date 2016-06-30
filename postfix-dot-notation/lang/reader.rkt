@@ -1,34 +1,18 @@
-(module reader racket/base
-  (require syntax/module-reader
-           (only-in "../reader.rkt" make-postfix-dot-readtable wrap-reader))
-  
-  (provide (rename-out [postfix-dot-read read]
-                       [postfix-dot-read-syntax read-syntax]
-                       [postfix-dot-get-info get-info]))
-  
-  (define-values (postfix-dot-read postfix-dot-read-syntax postfix-dot-get-info)
-    (make-meta-reader
-     'postfix-dot-notation
-     "language path"
-     (lambda (bstr)
-       (let* ([str (bytes->string/latin-1 bstr)]
-              [sym (string->symbol str)])
-         (and (module-path? sym)
-              (vector
-               ;; try submod first:
-               `(submod ,sym reader)
-               ;; fall back to /lang/reader:
-               (string->symbol (string-append str "/lang/reader"))))))
-     wrap-reader
-     (lambda (orig-read-syntax)
-       (define read-syntax (wrap-reader orig-read-syntax))
-       (lambda args
-         (define stx (apply read-syntax args))
-         (define old-prop (syntax-property stx 'module-language))
-         (define new-prop `#(postfix-dot-notation/lang/language-info get-language-info ,old-prop))
-         (syntax-property stx 'module-language new-prop)))
-     (lambda (proc)
-       (lambda (key defval)
-         (define (fallback) (if proc (proc key defval) defval))
-         (case key
-           [else (fallback)]))))))
+#lang lang-extension
+#:lang-extension postfix-dot-notation make-postfix-dot-lang-reader
+#:lang-reader postfix-dot-notation-lang
+(require lang-reader/lang-reader
+         (only-in "../reader.rkt" wrap-reader))
+
+(define (make-postfix-dot-lang-reader lang-reader)
+  (define/lang-reader [-read -read-syntax -get-info] lang-reader)
+  (make-lang-reader
+   (wrap-reader -read)
+   (let ([read-syntax (wrap-reader -read-syntax)])
+     (lambda args
+       (define stx (apply read-syntax args))
+       (define old-prop (syntax-property stx 'module-language))
+       (define new-prop `#(postfix-dot-notation/lang/language-info get-language-info ,old-prop))
+       (syntax-property stx 'module-language new-prop)))
+   -get-info))
+
